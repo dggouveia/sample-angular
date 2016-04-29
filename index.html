@@ -1,176 +1,79 @@
 <html lang="en" >
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta charset="UTF-8">
-        <title>Teste Angular</title>
-        <!-- Angular Material style sheet -->
-        <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css">
-        <link rel="stylesheet" href="css/index.css">
-    </head>
-    <body ng-app="myApp" ng-cloak>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Teste Angular</title>
+  <!-- Angular Material style sheet -->
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body ng-app="myApp" ng-cloak>
 
-        <div class="main" ng-controller="MainController">
-            <div id="map">
-                <!-- <img ng-src="{{ logo}}" alt="" width="100px"> -->
-            </div>
-            <md-card class=form>
-                <img ng-src="{{imagePath}}" class="md-card-image hide" alt="Washed Out">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">{{ message}}</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <md-input-container class="md-block" flex-gt-sm>
-                        <label>Digite sua busca</label>
-                        <input ng-model="query">
-                    </md-input-container>
-                </md-card-content>
-                <md-card-actions layout="row" layout-align="end center">
-                    <md-button ng-click="search()">Procurar</md-button>
-                </md-card-actions>
-            </md-card>
-        </div>
+  <div class="main" ng-controller="MainController" class="blue900">
+    <div id="map">
+      <!-- <img ng-src="{{ logo}}" alt="" width="100px"> -->
+    </div>
+    <md-card class=form>
+      <img id="cardImage" ng-src="{{imagePath}}" class="md-card-image hide" alt="Washed Out">
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">{{ message}}</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content>
+        <form ng-submit="search()">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Digite sua busca</label>
+            <input ng-model="query">
+          </md-input-container>
+        </form>
+      </md-card-content>
+      <md-card-actions layout="row" layout-align="end center">
+        <md-button ng-click="search()">Procurar</md-button>
+      </md-card-actions>
+    </md-card>
+  </div>
 
-        <!-- Angular Material requires Angular.js Libraries -->
-        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
-        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-route.js"></script>
-        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
-        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
-        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
+  <!-- Angular Material requires Angular.js Libraries -->
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-route.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
 
-        <!-- Angular Material Library -->
-        <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js"></script>
+  <!-- Angular Material Library -->
+  <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js"></script>
 
-        <script src="https://apis.google.com/js/client.js"></script>
-    </script>
-    <script>
+  <script src="js/jQuery-2.1.4.min.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/controllers/MainController.js"></script>
+</script>
+<script>
 
-                        var map;
-                        var service;
-                        var infowindow;
-                        // Iniciando a aplicação angular
-                        var app = angular.module('myApp', ['ngMaterial', 'ngRoute']);
-                        var httpService;
+var map;
+var googlePlacesService;
 
-                        // Tentando iniciar o GAPI, para acesso CORS das APIs google [Erro]
-                        gapi.load('auth', function () {
-                            console.log(gapi.client);
-                            gapi.client.setApiKey('AIzaSyB5lOP3QcLrVIZPSLNww2uxiXnQBPNOPSY');
-                        })
+// Iniciando API Google Maps
+function initializeGoogleMaps() {
+  map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 15
+  });
+  googlePlacesService = new google.maps.places.PlacesService(map);
+}
 
-                        // Instanciando o controlador
-                        app.controller('MainController', [
-                          // Solicitando injeção de dependências
-                            '$scope', '$http', function ($scope, $http) {
-                                $scope.message = "Digite um CEP para iniciar sua busca",
-                                        $scope.query = "",
-                                        $scope.info = {},
-                                        $scope.imagePath = "img/index-bg.jpg",
-                                        httpService = $http,
-                                        // Criando método de busca
-                                        $scope.search = function (data) {
-                                            // $http.get("https://viacep.com.br/ws/" + $scope.CEP + "/json/")
-                                            //         .then(
-                                            //                 function (data) {
-                                            //                     request = {
-                                            //                         query: data.data.localidade
-                                            //                     }
-                                            //                     service.textSearch(request, callback);
-                                            //                     $scope.message = "Você pesquisou por " + data.data.localidade
-                                            //                 },
-                                            //                 function (data) {
+// Método que desenha mapa
+function createMarker(place) {
+  var placeLoc = place.geometry.location;
 
-                                            // Setando a o valor do campo do formulário à busca
-                                            request = {
-                                                query: $scope.query
-                                            }
-                                            // Fazendo a busca com o valor do formulário
-                                            service.textSearch(request, function (results, status) {
-                                              // Verificando se há locais que correspondem à busca
-                                                if (status == google.maps.places.PlacesServiceStatus.OK) {
-                                                  // Iterando sobre os locais correspondentes
-                                                    for (var i = 0; i < results.length; i++) {
-                                                      // recuperando o local
-                                                        var place = results[i];
-                                                        console.log(place);
-                                                        // Desenhando o mapa com as informações do local
-                                                        createMarker(place);
-                                                        console.log("https://maps.googleapis.com/maps/api/place/details/json?reference=" + place.reference + "&key=AIzaSyDtnIV9DYX2dlNojZIrP16ZMBxlcBwVs98");
-                                                        // Requisitando mais detalhes sobre o local [Erro]
-                                                        $http.get("https://maps.googleapis.com/maps/api/place/details/json?reference=" + place.reference + "&key=AIzaSyDtnIV9DYX2dlNojZIrP16ZMBxlcBwVs98")
-                                                                .then(
-                                                                        function (data) {
-                                                                            console.log(data)
-                                                                        },
-                                                                        function (err) {
-                                                                            console.log(err)
-                                                                        }
-                                                                );
-                                                    }
-                                                }
-                                            });
-                                            $scope.message = "Realizar nova busca"
-                                            //         }
-                                            // );
-                                        };
-                            }
-                        ]);
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: placeLoc,
+    zoom: 15
+  });
+}
 
-                        // Iniciando API Google Maps
-                        function initialize() {
+</script>
 
-                            map = new google.maps.Map(document.getElementById('map'), {
-                                zoom: 15
-                            });
-
-                            service = new google.maps.places.PlacesService(map);
-                        }
-
-
-                        function callback(results, status) {
-                            if (status == google.maps.places.PlacesServiceStatus.OK) {
-                                for (var i = 0; i < results.length; i++) {
-                                    var place = results[i];
-                                    console.log(place);
-                                    createMarker(place);
-
-                                    httpService.get("https://maps.googleapis.com/maps/api/place/details/json?reference=" + place.reference + "&key=AIzaSyDtnIV9DYX2dlNojZIrP16ZMBxlcBwVs98")
-                                            .then(
-                                                    function (data) {
-                                                        console.log(data)
-                                                    },
-                                                    function (err) {
-                                                        console.log(err)
-                                                    }
-                                            );
-                                    // httpService.get("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+place.reference+"&key=AIzaSyB5lOP3QcLrVIZPSLNww2uxiXnQBPNOPSY")
-                                    // .then(
-                                    //   function(data){
-                                    //     console.log(data)
-                                    //   },
-                                    //   function(err){
-                                    //     console.log(err)
-                                    //   }
-                                    // );
-                                }
-                            }
-                        }
-
-                        // Método que desenha mapa
-                        function createMarker(place) {
-                            var placeLoc = place.geometry.location;
-
-                            map = new google.maps.Map(document.getElementById('map'), {
-                                center: placeLoc,
-                                zoom: 15
-                            });
-                        }
-    </script>
-
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDtnIV9DYX2dlNojZIrP16ZMBxlcBwVs98&libraries=places&callback=initialize"></script>
-
-    <!-- <script src="js/controllers/MainController.js" /> -->
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDtnIV9DYX2dlNojZIrP16ZMBxlcBwVs98&libraries=places&callback=initializeGoogleMaps"></script>
 
 </body>
 </html>
