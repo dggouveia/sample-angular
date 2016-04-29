@@ -14,22 +14,30 @@
       <!-- <img ng-src="{{ logo}}" alt="" width="100px"> -->
     </div>
     <md-card class=form>
-      <img id="cardImage" ng-src="{{imagePath}}" class="md-card-image hide" alt="Washed Out">
+      <md-progress-linear id="progressBar" md-mode="indeterminate" class="hide"></md-progress-linear>
+      <div id="cardImage" class="hide">
+        <div class="md-card-image">
+          <img  ng-src="{{imagePath}}" alt="Washed Out">
+          <!-- Utilizando filtro definido no arquivo app.js para retornar código
+               HTML puro -->
+          <small ng-repeat="author in imageAuthor"> Foto por: <span ng-bind-html="author | htmlCode"></span> </small>
+        </div>
+      </div>
       <md-card-title>
         <md-card-title-text>
           <span class="md-headline">{{ message}}</span>
         </md-card-title-text>
       </md-card-title>
       <md-card-content>
-        <form ng-submit="search()">
+        <form id="searchForm" ng-submit="search()">
           <md-input-container class="md-block" flex-gt-sm>
             <label>Digite sua busca</label>
-            <input ng-model="query">
+            <input id="searchInput" ng-model="query">
           </md-input-container>
         </form>
       </md-card-content>
       <md-card-actions layout="row" layout-align="end center">
-        <md-button ng-click="search()">Procurar</md-button>
+        <md-button id="searchButton" ng-click="search()">Procurar</md-button>
       </md-card-actions>
     </md-card>
   </div>
@@ -52,6 +60,11 @@
 
 var map;
 var googlePlacesService;
+var searchInput;
+var placesTypes;
+var autocomplete;
+var infoWindow;
+var marker;
 
 // Iniciando API Google Maps
 function initializeGoogleMaps() {
@@ -59,16 +72,10 @@ function initializeGoogleMaps() {
     zoom: 15
   });
   googlePlacesService = new google.maps.places.PlacesService(map);
-}
 
-// Método que desenha mapa
-function createMarker(place) {
-  var placeLoc = place.geometry.location;
-
-  map = new google.maps.Map(document.getElementById('map'), {
-    center: placeLoc,
-    zoom: 15
-  });
+  searchInput = document.getElementById('searchInput');
+  autocomplete = new google.maps.places.Autocomplete(searchInput);
+  autocomplete.bindTo('bounds', map);
 }
 
 </script>

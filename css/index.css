@@ -1,6 +1,6 @@
 /*Colors*/
 .blue900{
-  background-color: #0D47A1; 
+  background-color: #0D47A1;
 }
 body{
   background: #e9eaed;
@@ -31,4 +31,14 @@ header{
 }
 .form-title{
   text-align: center;
+}
+.md-card-image small{
+  margin:10px;
+  color:white !important;
+  position:relative;
+  bottom:30px;
+  float:right;
+}
+.md-card-image small a{
+  color:white;
 }
