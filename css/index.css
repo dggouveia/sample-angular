@@ -1,0 +1,34 @@
+body{
+  background: #e9eaed;
+  min-height: 100% !important;
+  height: auto !important;
+}
+header{
+  background: url("../img/index-bg.jpg") no-repeat center;
+  background-size: cover;
+  width: 100%;
+  height:300px;
+  text-align: center;
+  padding-top:100px;
+}
+#map{
+  width:100%;
+  height: 400px;
+  background: url("../img/index-bg.jpg") no-repeat center;
+  background-size: cover;
+}
+.form{
+  max-width: 500px !important;
+  margin:0 auto;
+  position: relative;
+  bottom:100px;
+}
+.form img{
+  height:300px !important;
+}
+.form img.hide{
+  display: none;
+}
+.form-title{
+  text-align: center;
+}
